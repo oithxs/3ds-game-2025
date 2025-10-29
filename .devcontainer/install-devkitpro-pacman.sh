@@ -20,4 +20,4 @@ fi
 
 # Finally install devkitPro pacman
 apt-get update
-apt-get install devkitpro-pacman -y
+apt-get install imagemagick devkitpro-pacman -y
