@@ -3,8 +3,8 @@
 #include <string.h>
 #include <3ds.h>
 
-#define BOARD_WIDTH 40
-#define BOARD_HEIGHT 20
+#define BOARD_WIDTH 30
+#define BOARD_HEIGHT 18
 #define MAX_SNAKE_LENGTH 100
 
 typedef struct {
@@ -17,7 +17,7 @@ typedef struct {
     int direction; // 0: up, 1: right, 2: down, 3: left
 } Snake;
 
-char board[BOARD_HEIGHT][BOARD_WIDTH];
+char board[BOARD_HEIGHT][BOARD_WIDTH + 1]; // +1 for null terminator
 Snake snake;
 Point food;
 int score = 0;
@@ -101,11 +101,35 @@ void updateSnake() {
     }
 }
 
-void drawGame() {
-    consoleClear();
+void drawGameOver() {
+    // Clear console and position cursor
+    printf("\x1b[2J");  // Clear screen
+    printf("\x1b[H");   // Move cursor to home position
     
-    // Clear board
-    memset(board, ' ', sizeof(board));
+    // Display game over screen with ASCII only
+    printf("\n");
+    printf("    +---------------------------+\n");
+    printf("    |                           |\n");
+    printf("    |        GAME OVER!         |\n");
+    printf("    |                           |\n");
+    printf("    |      Final Score: %3d     |\n", score);
+    printf("    |                           |\n");
+    printf("    |    A: Restart Game        |\n");
+    printf("    |    START: Quit            |\n");
+    printf("    |                           |\n");
+    printf("    +---------------------------+\n");
+    printf("\n");
+    
+    // Force flush output
+    fflush(stdout);
+}
+
+void drawGame() {
+    // Clear board and null terminate each line
+    for (int y = 0; y < BOARD_HEIGHT; y++) {
+        memset(board[y], ' ', BOARD_WIDTH);
+        board[y][BOARD_WIDTH] = '\0'; // Null terminate each line
+    }
     
     // Draw borders
     for (int x = 0; x < BOARD_WIDTH; x++) {
@@ -129,21 +153,21 @@ void drawGame() {
     // Draw food
     board[food.y][food.x] = '*';
     
-    // Print board
+    // Clear console and position cursor
+    printf("\x1b[2J");  // Clear screen
+    printf("\x1b[H");   // Move cursor to home position
+    
+    // Print board line by line
     for (int y = 0; y < BOARD_HEIGHT; y++) {
-        for (int x = 0; x < BOARD_WIDTH; x++) {
-            printf("%c", board[y][x]);
-        }
-        printf("\n");
+        printf("%s\n", board[y]);
     }
     
     printf("\nScore: %d\n", score);
-    printf("D-Pad: Move  START: Quit\n");
+    printf("Controls: Arrow Keys = Move\n");
+    printf("          START = Quit\n");
     
-    if (!gameRunning) {
-        printf("\nGAME OVER!\n");
-        printf("A: Restart  START: Quit\n");
-    }
+    // Force flush output
+    fflush(stdout);
 }
 
 int main(int argc, char* argv[])
@@ -155,11 +179,14 @@ int main(int argc, char* argv[])
     initGame();
     
     int frameCounter = 0;
+    int gameOverDisplayed = 0; // Track if game over screen is displayed
+    
+    // Initial draw
+    drawGame();
     
     // Main loop
     while (aptMainLoop())
     {
-        gspWaitForVBlank();
         hidScanInput();
         
         u32 kDown = hidKeysDown();
@@ -168,6 +195,8 @@ int main(int argc, char* argv[])
             break; // Exit game
         
         if (gameRunning) {
+            gameOverDisplayed = 0; // Reset flag when game is running
+            
             // Handle input
             if (kDown & KEY_DUP && snake.direction != 2) {
                 snake.direction = 0; // Up
@@ -179,21 +208,29 @@ int main(int argc, char* argv[])
                 snake.direction = 3; // Left
             }
             
-            // Update game logic every 10 frames (adjust for speed)
+            // Update game logic every 15 frames (slower for better visibility)
             frameCounter++;
-            if (frameCounter >= 10) {
+            if (frameCounter >= 15) {
                 updateSnake();
+                drawGame();
                 frameCounter = 0;
             }
         } else {
-            // Game over state
+            // Game over state - only draw once
+            if (!gameOverDisplayed) {
+                drawGameOver();
+                gameOverDisplayed = 1;
+            }
+            
             if (kDown & KEY_A) {
                 initGame(); // Restart game
                 frameCounter = 0;
+                gameOverDisplayed = 0;
+                drawGame(); // Draw initial game state
             }
         }
         
-        drawGame();
+        gspWaitForVBlank();
         gfxSwapBuffers();
     }
     
