@@ -103,8 +103,8 @@ void updateSnake() {
 
 void drawGameOver() {
     // Clear console and position cursor
-    printf("\x1b[2J");  // Clear screen
-    printf("\x1b[H");   // Move cursor to home position
+    consoleClear();
+    // printf("\x1b[H");   // Move cursor to home position
     
     // Display game over screen with ASCII only
     printf("\n");
@@ -154,9 +154,9 @@ void drawGame() {
     board[food.y][food.x] = '*';
     
     // Clear console and position cursor
-    printf("\x1b[2J");  // Clear screen
-    printf("\x1b[H");   // Move cursor to home position
-    
+    consoleClear();
+    // printf("\x1b[H");   // Move cursor to home position
+
     // Print board line by line
     for (int y = 0; y < BOARD_HEIGHT; y++) {
         printf("%s\n", board[y]);
