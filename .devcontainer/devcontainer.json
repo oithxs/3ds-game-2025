@@ -1,23 +1,26 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
 {
-  "name": "",
-  "dockerComposeFile": "docker-compose.yml",
-  "service": "devcontainer",
-  "workspaceFolder": "/workspace",
-  "features": {
-    "ghcr.io/devcontainers/features/github-cli:1": {}
-  },
-  "onCreateCommand": "./.devcontainer/OnCreateCommand.sh",
-  "customizations": {
-    "vscode": {
-      "settings": {
-        "editor.formatOnSave": true,
-        "[c]": {
-            "editor.defaultFormatter": "ms-vscode.cpptools-extension-pack"
+    "name": "3ds-snakegame-2025",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "devcontainer",
+    "workspaceFolder": "/workspace",
+    "features": {
+        "ghcr.io/devcontainers/features/github-cli:1": {}
+    },
+    "onCreateCommand": "./.devcontainer/OnCreateCommand.sh",
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "editor.formatOnSave": true,
+                "[c]": {
+                    "editor.defaultFormatter": "ms-vscode.cpptools-extension-pack"
+                }
+            },
+            "extensions": [
+                "EditorConfig.EditorConfig",
+                "ms-vscode.cpptools-extension-pack"
+            ]
         }
-      },
-      "extensions": ["EditorConfig.EditorConfig", "ms-vscode.cpptools-extension-pack"]
     }
-  }
 }
